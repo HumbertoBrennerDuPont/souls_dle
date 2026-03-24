@@ -1,0 +1,395 @@
+// ─── Banco de Dados de Personagens ────────────────────────────────────────────
+// height/weight são relativos para comparação: ↑ se maior, ↓ se menor, = se igual
+
+const CHARACTERS = [
+  {
+    id: "artorias",
+    name: "Artorias",
+    image: "imgs/artorias_header_full (1).jpg",
+    emoji: "🐺",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 200,      // cm estimado (lore)
+    weight: 95,       // kg estimado
+    weapon: "Greatsword",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "sif",
+    name: "Sif",
+    image: null,
+    emoji: "🐺",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 180,
+    weight: 120,
+    weapon: "Greatsword",
+    race: "Animal",
+    gender: "Masculino"
+  },
+  {
+    id: "ornstein",
+    name: "Ornstein",
+    image: null,
+    emoji: "🦁",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 220,
+    weight: 105,
+    weapon: "Spear",
+    race: "Semideus",
+    gender: "Masculino"
+  },
+  {
+    id: "smough",
+    name: "Smough",
+    image: null,
+    emoji: "🔨",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 250,
+    weight: 200,
+    weapon: "Hammer",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "gwyndolin",
+    name: "Gwyndolin",
+    image: null,
+    emoji: "🌙",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 190,
+    weight: 70,
+    weapon: "Catalyst",
+    race: "Semideus",
+    gender: "Masculino"
+  },
+  {
+    id: "gwyn",
+    name: "Gwyn",
+    image: null,
+    emoji: "⚡",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 230,
+    weight: 130,
+    weapon: "Greatsword",
+    race: "Semideus",
+    gender: "Masculino"
+  },
+  {
+    id: "solaire",
+    name: "Solaire de Astora",
+    image: "imgs/DS1R_Solaire_of_Astora_in_Undead_Burg_(half_body,_front) (1).webp",
+    emoji: "☀️",
+    type: "NPC",
+    game: "Dark Souls I",
+    height: 185,
+    weight: 90,
+    weapon: "Straight Sword",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "siegmeyer",
+    name: "Siegmeyer",
+    image: null,
+    emoji: "🛡️",
+    type: "NPC",
+    game: "Dark Souls I",
+    height: 175,
+    weight: 110,
+    weapon: "Spear",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "patches",
+    name: "Patches",
+    image: null,
+    emoji: "🪝",
+    type: "NPC",
+    game: "Dark Souls I",
+    height: 170,
+    weight: 75,
+    weapon: "Whip",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "priscilla",
+    name: "Priscilla",
+    image: null,
+    emoji: "❄️",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 280,
+    weight: 90,
+    weapon: "Scythe",
+    race: "Crossbreed",
+    gender: "Feminino"
+  },
+  {
+    id: "queelag",
+    name: "Quelaag",
+    image: null,
+    emoji: "🕷️",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 160,
+    weight: 300,
+    weapon: "Fire Sword",
+    race: "Caos",
+    gender: "Feminino"
+  },
+  {
+    id: "nito",
+    name: "Gravelord Nito",
+    image: null,
+    emoji: "💀",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 240,
+    weight: 80,
+    weapon: "Great Scythe",
+    race: "Semideus",
+    gender: "Masculino"
+  },
+  {
+    id: "seath",
+    name: "Seath the Scaleless",
+    image: null,
+    emoji: "🐉",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 400,
+    weight: 500,
+    weapon: "Crystal",
+    race: "Dragão",
+    gender: "Masculino"
+  },
+  {
+    id: "vier",
+    name: "Four Kings",
+    image: null,
+    emoji: "👑",
+    type: "Boss",
+    game: "Dark Souls I",
+    height: 260,
+    weight: 110,
+    weapon: "Dark Sword",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  // ── Dark Souls II ──────────────────────────────────────────────────────────
+  {
+    id: "nashandra",
+    name: "Nashandra",
+    image: null,
+    emoji: "👸",
+    type: "Boss",
+    game: "Dark Souls II",
+    height: 170,
+    weight: 55,
+    weapon: "Scythe",
+    race: "Fragmento",
+    gender: "Feminino"
+  },
+  {
+    id: "vendrick",
+    name: "Vendrick",
+    image: null,
+    emoji: "👑",
+    type: "Boss",
+    game: "Dark Souls II",
+    height: 240,
+    weight: 140,
+    weapon: "Ultra Greatsword",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "velstadt",
+    name: "Velstadt",
+    image: null,
+    emoji: "⚔️",
+    type: "Boss",
+    game: "Dark Souls II",
+    height: 230,
+    weight: 145,
+    weapon: "Hammer",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "lucatiel",
+    name: "Lucatiel de Mirrah",
+    image: null,
+    emoji: "🗡️",
+    type: "NPC",
+    game: "Dark Souls II",
+    height: 168,
+    weight: 65,
+    weapon: "Straight Sword",
+    race: "Humano",
+    gender: "Feminino"
+  },
+  // ── Dark Souls III ─────────────────────────────────────────────────────────
+  {
+    id: "soul_of_cinder",
+    name: "Soul of Cinder",
+    image: null,
+    emoji: "🔥",
+    type: "Boss",
+    game: "Dark Souls III",
+    height: 220,
+    weight: 100,
+    weapon: "Greatsword",
+    race: "Amalgamação",
+    gender: "Indefinido"
+  },
+  {
+    id: "nameless_king",
+    name: "Nameless King",
+    image: null,
+    emoji: "⚡",
+    type: "Boss",
+    game: "Dark Souls III",
+    height: 210,
+    weight: 100,
+    weapon: "Spear",
+    race: "Semideus",
+    gender: "Masculino"
+  },
+  {
+    id: "pontiff",
+    name: "Pontiff Sulyvahn",
+    image: null,
+    emoji: "🗡️",
+    type: "Boss",
+    game: "Dark Souls III",
+    height: 200,
+    weight: 95,
+    weapon: "Twin Swords",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "aldrich",
+    name: "Aldrich",
+    image: null,
+    emoji: "🌑",
+    type: "Boss",
+    game: "Dark Souls III",
+    height: 300,
+    weight: 200,
+    weapon: "Sorcery Staff",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "dancer",
+    name: "Dancer of the Boreal Valley",
+    image: null,
+    emoji: "💃",
+    type: "Boss",
+    game: "Dark Souls III",
+    height: 280,
+    weight: 80,
+    weapon: "Twin Blades",
+    race: "Criatura",
+    gender: "Feminino"
+  },
+  {
+    id: "siegward",
+    name: "Siegward de Catarina",
+    image: null,
+    emoji: "🛡️",
+    type: "NPC",
+    game: "Dark Souls III",
+    height: 175,
+    weight: 115,
+    weapon: "Spear",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "yuria",
+    name: "Yuria de Londor",
+    image: null,
+    emoji: "🖤",
+    type: "NPC",
+    game: "Dark Souls III",
+    height: 165,
+    weight: 58,
+    weapon: "Straight Sword",
+    race: "Semioco",
+    gender: "Feminino"
+  },
+  {
+    id: "firekeeper",
+    name: "Fire Keeper",
+    image: null,
+    emoji: "🔥",
+    type: "NPC",
+    game: "Dark Souls III",
+    height: 170,
+    weight: 55,
+    weapon: "Nenhuma",
+    race: "Humano",
+    gender: "Feminino"
+  },
+  // ── Bloodborne ──────────────────────────────────────────────────────────────
+  {
+    id: "gehrman",
+    name: "Gehrman",
+    image: null,
+    emoji: "🌸",
+    type: "Boss",
+    game: "Bloodborne",
+    height: 185,
+    weight: 80,
+    weapon: "Burial Blade",
+    race: "Humano",
+    gender: "Masculino"
+  },
+  {
+    id: "ludwig",
+    name: "Ludwig",
+    image: null,
+    emoji: "🐴",
+    type: "Boss",
+    game: "Bloodborne",
+    height: 300,
+    weight: 350,
+    weapon: "Holy Moonlight Sword",
+    race: "Criatura",
+    gender: "Masculino"
+  },
+  {
+    id: "maria",
+    name: "Lady Maria",
+    image: null,
+    emoji: "⚙️",
+    type: "Boss",
+    game: "Bloodborne",
+    height: 175,
+    weight: 65,
+    weapon: "Rakuyo",
+    race: "Humano",
+    gender: "Feminino"
+  }
+];
+
+// Seleciona o personagem do dia com base em seed
+function getDailyCharacter() {
+  const today = new Date();
+  const seed = parseInt(
+    `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`,
+    10
+  );
+  return CHARACTERS[seed % CHARACTERS.length];
+}

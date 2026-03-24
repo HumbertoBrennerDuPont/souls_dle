@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dark Souls — Who Am I?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- PARTÍCULAS DE FUNDO -->
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <div id="app">
+
+    <!-- CABEÇALHO -->
+    <header class="site-header" role="banner">
+      <div class="header-flame" aria-hidden="true">
+        <div class="flame"></div>
+      </div>
+      <div class="header-text">
+        <h1 class="site-title">Dark Souls</h1>
+        <span class="site-subtitle">WHO AM I?</span>
+      </div>
+      <div class="header-flame" aria-hidden="true">
+        <div class="flame"></div>
+      </div>
+    </header>
+
+    <!-- INSTRUÇÃO -->
+    <section class="instructions" aria-label="Instruções">
+      <p>
+        Adivinhe o personagem do dia. Digite um nome para começar.
+        As cores indicam o quão próxima foi sua tentativa.
+      </p>
+      <div class="legend" role="list" aria-label="Legenda de cores">
+        <div class="legend-item" role="listitem">
+          <span class="legend-dot correct" aria-hidden="true"></span>
+          <span>Correto</span>
+        </div>
+        <div class="legend-item" role="listitem">
+          <span class="legend-dot partial" aria-hidden="true"></span>
+          <span>Próximo</span>
+        </div>
+        <div class="legend-item" role="listitem">
+          <span class="legend-dot incorrect" aria-hidden="true"></span>
+          <span>Errado</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUSCA / INPUT -->
+    <div class="search-container" id="searchContainer" role="search" aria-label="Buscar personagem">
+      <div class="search-wrapper">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Digite o nome de um personagem..."
+          autocomplete="off"
+          aria-label="Nome do personagem"
+          aria-autocomplete="list"
+          aria-controls="suggestionList"
+          aria-expanded="false"
+        />
+        <span class="search-icon" aria-hidden="true">⚔️</span>
+      </div>
+      <ul
+        class="suggestion-list hidden"
+        id="suggestionList"
+        role="listbox"
+        aria-label="Sugestões de personagens"
+      ></ul>
+    </div>
+
+    <!-- COLUNA DE LABELS -->
+    <div class="column-labels" aria-hidden="true">
+      <div class="col-label col-image">Personagem</div>
+      <div class="col-label col-type">Tipo</div>
+      <div class="col-label col-game">Jogo</div>
+      <div class="col-label col-height">Altura</div>
+      <div class="col-label col-weight">Peso</div>
+      <div class="col-label col-weapon">Arma</div>
+      <div class="col-label col-race">Raça</div>
+      <div class="col-label col-gender">Sexo</div>
+    </div>
+
+    <!-- ÁREA DE TENTATIVAS -->
+    <main class="guesses-area" id="guessesArea" role="main" aria-label="Tentativas anteriores" aria-live="polite">
+    </main>
+
+
+
+    <!-- MODAL DE VITÓRIA -->
+    <div
+      class="modal-overlay hidden"
+      id="victoryModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="victoryTitle"
+    >
+      <div class="modal-card">
+        <div class="modal-flame" aria-hidden="true">
+          <div class="flame flame-large"></div>
+        </div>
+        <h2 class="modal-title" id="victoryTitle">Fogueira Acesa!</h2>
+        <p class="modal-subtitle" id="victorySubtitle"></p>
+        <div class="modal-character" id="modalCharacter"></div>
+        <div class="modal-score" id="modalScore"></div>
+        <div class="modal-actions">
+          <button class="btn-modal-share" id="btnShare" aria-label="Compartilhar resultado">
+            Compartilhar 🔥
+          </button>
+          <button class="btn-modal-close" id="btnCloseModal" aria-label="Fechar modal">
+            Continuar →
+          </button>
+        </div>
+        <p class="modal-next" id="modalNext"></p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="data/characters.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
