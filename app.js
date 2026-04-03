@@ -2,11 +2,15 @@
 
 // ─── Estado ───────────────────────────────────────────────────────────────────
 const STATE = {
-  target: null,
-  guesses: [],
+  category: 'characters', // 'characters', 'items', 'scenery', 'music'
+  target:    null,
+  guesses:   [],
   guessedIds: new Set(),
-  won: false,
-  maxGuesses: 10
+  won:       false,
+  maxGuesses: 10,
+  zoomLevel: 4,      // Para o modo Cenário
+  isAudioPlaying: false,
+  audioTimer:    null
 };
 
 // ─── Cache de elementos ───────────────────────────────────────────────────────
@@ -18,8 +22,32 @@ const EL = {
   modalSub:    () => document.getElementById('victorySubtitle'),
   modalChar:   () => document.getElementById('modalCharacter'),
   modalScore:  () => document.getElementById('modalScore'),
-  modalNext:   () => document.getElementById('modalNext')
+  modalNext:   () => document.getElementById('modalNext'),
+  idleScreen:  () => document.getElementById('idleScreen'),
+  gameContent: () => document.getElementById('gameContent'),
+  menuCards:   () => document.querySelectorAll('.menu-card'),
+  btnBack:     () => document.getElementById('btnBackToMenu'),
+  
+  // Novos elementos
+  instruction: () => document.getElementById('instructionText'),
+  legend:      () => document.getElementById('gameLegend'),
+  vChallenge:  () => document.getElementById('visualChallenge'),
+  aChallenge:  () => document.getElementById('audioChallenge'),
+  charTable:   () => document.getElementById('characterTable'),
+  simpleHist:  () => document.getElementById('simpleHistory'),
+  histList:    () => document.getElementById('historyList'),
+  imgTarget:   () => document.getElementById('challengeImage'),
+  gameAudio:   () => document.getElementById('gameAudio'),
+  btnPlay:     () => document.getElementById('btnPlayMusic'),
+  playIcon:    () => document.getElementById('playIcon'),
+  playLabel:   () => document.getElementById('playLabel'),
+  progressBar: () => document.getElementById('audioProgressBar'),
 };
+
+// ─── Utilitários ──────────────────────────────────────────────────────────────
+function normalizeText(text) {
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
 
 // ─── Comparadores ─────────────────────────────────────────────────────────────
 const GAMES_ORDER = ['Dark Souls I','Dark Souls II','Dark Souls III','Bloodborne'];
@@ -122,8 +150,23 @@ function createGuessRow(char, comparison, index) {
 }
 
 // ─── Submissão de guess ────────────────────────────────────────────────────────
-function submitGuess(charId, isInitialLoad = false) {
+function submitGuess(value, isInitialLoad = false) {
   if (STATE.won && !isInitialLoad) return;
+
+  if (STATE.category === 'characters') {
+    handleCharacterGuess(value, isInitialLoad);
+  } else {
+    handleChallengeGuess(value, isInitialLoad);
+  }
+
+  if (!isInitialLoad) {
+    EL.input().value = '';
+    closeSuggestions();
+    saveProgress();
+  }
+}
+
+function handleCharacterGuess(charId, isInitialLoad) {
   if (STATE.guessedIds.has(charId)) {
     if (!isInitialLoad) showToast('Você já tentou este personagem!');
     return;
@@ -137,11 +180,8 @@ function submitGuess(charId, isInitialLoad = false) {
   const row = createGuessRow(char, comparison, STATE.guesses.length);
 
   const area = EL.guessesArea();
-
-  // Insere no topo
   area.insertBefore(row, area.firstChild);
   
-  // No carregamento inicial, não esperamos o frame para revelar (animação instantânea ou via CSS)
   if (isInitialLoad) {
     row.classList.add('revealed');
   } else {
@@ -150,42 +190,98 @@ function submitGuess(charId, isInitialLoad = false) {
 
   STATE.guesses.push({ char, comparison });
 
-  // Atualiza contadores (removidos conforme solicitado)
-
-
-  if (!isInitialLoad) {
-    EL.input().value = '';
-    closeSuggestions();
-    saveProgress();
-  }
-
-  // Verifica vitória/derrota
   if (char.id === STATE.target.id) {
     STATE.won = true;
-    if (isInitialLoad) {
-        showVictoryModal(char); // Mostra direto sem delay se já ganhou hoje
-    } else {
-        setTimeout(() => showVictoryModal(char), 700);
-    }
+    const delay = isInitialLoad ? 0 : 700;
+    setTimeout(() => showVictoryModal(char), delay);
   } else if (STATE.guesses.length >= STATE.maxGuesses) {
-    if (isInitialLoad) {
-        showDefeatModal();
-    } else {
-        setTimeout(() => showDefeatModal(), 700);
+    const delay = isInitialLoad ? 0 : 700;
+    setTimeout(() => showDefeatModal(), delay);
+  }
+}
+
+function handleChallengeGuess(guessName, isInitialLoad) {
+  const normalizedGuess = normalizeText(guessName);
+  const normalizedTarget = normalizeText(STATE.target.name);
+
+  // Impede duplicados no histórico visual
+  const isDuplicate = STATE.guesses.some(g => normalizeText(g.name) === normalizedGuess);
+  if (isDuplicate && !isInitialLoad) {
+    showToast('Você já tentou isso!');
+    return;
+  }
+
+  const isCorrect = normalizedGuess === normalizedTarget;
+  const result = {
+    name: guessName,
+    correct: isCorrect
+  };
+
+  const pool = getCategoryPool();
+  const targetItem = pool.find(i => normalizeText(i.name) === normalizedGuess);
+  if (targetItem) STATE.guessedIds.add(targetItem.id);
+
+  STATE.guesses.push(result);
+  addHistoryItem(result);
+
+  if (isCorrect) {
+    STATE.won = true;
+    const delay = isInitialLoad ? 0 : 500;
+    setTimeout(() => showVictoryModal(STATE.target), delay);
+  } else {
+    // Reduz zoom no modo cenário se este ainda for o caso
+    if (STATE.category === 'scenery') {
+      STATE.zoomLevel = Math.max(1, STATE.zoomLevel - 0.5);
+      updateVisualZoom();
     }
+
+    if (STATE.guesses.length >= STATE.maxGuesses) {
+      const delay = isInitialLoad ? 0 : 500;
+      setTimeout(() => showDefeatModal(), delay);
+    }
+  }
+}
+
+function addHistoryItem(item) {
+  const list = EL.histList();
+  const el = document.createElement('div');
+  el.className = `history-item ${item.correct ? 'correct' : 'incorrect'}`;
+  el.innerHTML = `
+    <span class="history-status">${item.correct ? '✅' : '❌'}</span>
+    <span class="history-name">${item.name}</span>
+    <span class="history-result">${item.correct ? 'Correto' : 'Errado'}</span>
+  `;
+  list.insertBefore(el, list.firstChild);
+}
+
+function updateVisualZoom() {
+  const img = EL.imgTarget();
+  if (img) {
+    img.style.transform = `scale(${STATE.zoomLevel})`;
   }
 }
 
 // ─── Autocomplete ─────────────────────────────────────────────────────────────
 let selectedSuggestionIndex = -1;
 
+function getCategoryPool() {
+  if (STATE.category === 'characters') return CHARACTERS;
+  if (STATE.category === 'items') return ITEMS;
+  if (STATE.category === 'scenery') return SCENERY;
+  if (STATE.category === 'music') return MUSIC;
+  return [];
+}
+
 function filterSuggestions(query) {
-  if (!query || query.length < 2) return [];
-  const q = query.toLowerCase().trim();
-  return CHARACTERS.filter(c =>
-    !STATE.guessedIds.has(c.id) &&
-    c.name.toLowerCase().includes(q)
-  ).slice(0, 8);
+  if (!query || query.length < 1) return [];
+  
+  const q = normalizeText(query);
+  const pool = getCategoryPool();
+  
+  return pool.filter(item => {
+    const itemName = normalizeText(item.name);
+    return !STATE.guessedIds.has(item.id) && itemName.includes(q);
+  }).slice(0, 8);
 }
 
 function renderSuggestions(matches) {
@@ -199,20 +295,40 @@ function renderSuggestions(matches) {
     return;
   }
 
-  matches.forEach((char, i) => {
+  const defaultEmojis = {
+    characters: '👤',
+    items: '🏺',
+    scenery: '🏰',
+    music: '🎵'
+  };
+
+  matches.forEach((item, i) => {
     const li = document.createElement('li');
     li.className = 'suggestion-item';
     li.setAttribute('role', 'option');
     li.setAttribute('id', `suggestion-${i}`);
     li.setAttribute('aria-selected', 'false');
+    
+    const emoji = item.emoji || defaultEmojis[STATE.category];
+    const meta = item.game ? `${item.game} · ${item.type}` : (item.type || '');
+
     li.innerHTML = `
-      <span class="sug-avatar" aria-hidden="true">${char.emoji}</span>
+      <span class="sug-avatar" aria-hidden="true">${emoji}</span>
       <div class="sug-info">
-        <span class="sug-name">${highlightMatch(char.name, EL.input().value)}</span>
-        <span class="sug-meta">${char.game} · ${char.type}</span>
+        <span class="sug-name">${highlightMatch(item.name, EL.input().value)}</span>
+        <span class="sug-meta">${meta}</span>
       </div>
     `;
-    li.addEventListener('click', () => submitGuess(char.id));
+    
+    li.addEventListener('click', () => {
+      // Para personagens enviamos ID, para os outros enviamos o Nome
+      if (STATE.category === 'characters') {
+        submitGuess(item.id);
+      } else {
+        submitGuess(item.name);
+      }
+    });
+    
     li.addEventListener('mouseenter', () => setSelectedSuggestion(i));
     list.appendChild(li);
   });
@@ -256,23 +372,36 @@ function initInputEvents() {
   });
 
   input.addEventListener('keydown', (e) => {
-    const items = EL.suggestions().querySelectorAll('.suggestion-item');
-    const count = items.length;
+    const suggestionsVisible = !EL.suggestions().classList.contains('hidden');
 
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setSelectedSuggestion((selectedSuggestionIndex + 1) % count);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setSelectedSuggestion((selectedSuggestionIndex - 1 + count) % count);
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < count) {
-        items[selectedSuggestionIndex].click();
-      } else if (count === 1) {
-        items[0].click();
+    if (suggestionsVisible) {
+      const items = EL.suggestions().querySelectorAll('.suggestion-item');
+      const count = items.length;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedSuggestion((selectedSuggestionIndex + 1) % count);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedSuggestion((selectedSuggestionIndex - 1 + count) % count);
+      } else if (e.key === 'Enter') {
+        if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < count) {
+          e.preventDefault();
+          items[selectedSuggestionIndex].click();
+          return;
+        }
       }
-    } else if (e.key === 'Escape') {
+    }
+
+    if (e.key === 'Enter') {
+      const val = e.target.value.trim();
+      if (val) {
+        e.preventDefault();
+        submitGuess(val);
+      }
+    }
+
+    if (e.key === 'Escape') {
       closeSuggestions();
     }
   });
@@ -282,10 +411,53 @@ function initInputEvents() {
       closeSuggestions();
     }
   });
+
+  // Efeito de reprodução de áudio
+  EL.btnPlay().addEventListener('click', toggleAudio);
+}
+
+function toggleAudio() {
+  const audio = EL.gameAudio();
+  if (STATE.isAudioPlaying) {
+    audio.pause();
+    STATE.isAudioPlaying = false;
+    EL.playIcon().textContent = '▶️';
+    EL.playLabel().textContent = 'Ouvir (15s)';
+    if (STATE.audioTimer) {
+      clearTimeout(STATE.audioTimer);
+      STATE.audioTimer = null;
+    }
+  } else {
+    audio.currentTime = 0;
+    audio.play();
+    STATE.isAudioPlaying = true;
+    EL.playIcon().textContent = '⏸️';
+    EL.playLabel().textContent = 'Ouvindo...';
+    
+    // Auto-stop após 15s
+    STATE.audioTimer = setTimeout(() => {
+      audio.pause();
+      STATE.isAudioPlaying = false;
+      EL.playIcon().textContent = '▶️';
+      EL.playLabel().textContent = 'Ouvir (15s)';
+      STATE.audioTimer = null;
+    }, 15000);
+  }
+}
+
+function updateAudioProgress() {
+  const audio = EL.gameAudio();
+  const bar = EL.progressBar();
+  if (!audio || !bar) return;
+  
+  audio.ontimeupdate = () => {
+    const pct = Math.min(100, (audio.currentTime / 15) * 100);
+    bar.style.width = `${pct}%`;
+  };
 }
 
 // ─── Modais ───────────────────────────────────────────────────────────────────
-function showVictoryModal(char) {
+function showVictoryModal(target) {
   const messages = [
     "Você acendeu a fogueira!",
     "A escuridão recuou diante de você.",
@@ -297,11 +469,15 @@ function showVictoryModal(char) {
   
   document.getElementById('victoryTitle').textContent = 'Fogueira Acesa!';
   EL.modalSub().textContent = `${msg} — ${STATE.guesses.length} tentativa${STATE.guesses.length !== 1 ? 's' : ''}`;
+  
+  const displayEmoji = target.emoji || (STATE.category === 'music' ? '🎵' : STATE.category === 'items' ? '⚔️' : '🏰');
+  const displayMeta = target.game ? `${target.type} · ${target.game}` : (target.type || '');
+
   EL.modalChar().innerHTML = `
     <div class="modal-char-display">
-      <span class="modal-char-emoji" aria-hidden="true">${char.emoji}</span>
-      <span class="modal-char-name">${char.name}</span>
-      <span class="modal-char-meta">${char.type} · ${char.game}</span>
+      <span class="modal-char-emoji" aria-hidden="true">${displayEmoji}</span>
+      <span class="modal-char-name">${target.name}</span>
+      <span class="modal-char-meta">${displayMeta}</span>
     </div>
   `;
 
@@ -329,12 +505,17 @@ function showVictoryModal(char) {
 }
 
 function showDefeatModal() {
-  EL.modalSub().textContent = `Você foi derrotado. O personagem era...`;
+  EL.modalSub().textContent = `Você foi derrotado. A resposta era...`;
+  
+  const target = STATE.target;
+  const displayEmoji = target.emoji || (STATE.category === 'music' ? '🎵' : STATE.category === 'items' ? '⚔️' : '🏰');
+  const displayMeta = target.game ? `${target.type} · ${target.game}` : (target.type || '');
+
   EL.modalChar().innerHTML = `
     <div class="modal-char-display">
-      <span class="modal-char-emoji" aria-hidden="true">${STATE.target.emoji}</span>
-      <span class="modal-char-name">${STATE.target.name}</span>
-      <span class="modal-char-meta">${STATE.target.type} · ${STATE.target.game}</span>
+      <span class="modal-char-emoji" aria-hidden="true">${displayEmoji}</span>
+      <span class="modal-char-name">${target.name}</span>
+      <span class="modal-char-meta">${displayMeta}</span>
     </div>
   `;
   document.getElementById('victoryTitle').textContent = 'A Chama se Apagou';
@@ -372,17 +553,25 @@ function startCountdown() {
 
 // ─── Compartilhar ─────────────────────────────────────────────────────────────
 function shareResult() {
-  const emojiMap = { correct: '🟩', partial: '🟨', incorrect: '🟥' };
-  const fields = ['type','game','height','weight','weapon','race','gender'];
+  let lines = "";
+  let modeName = "";
 
-  const lines = STATE.guesses.map(g =>
-    fields.map(f => emojiMap[g.comparison[f].result]).join('')
-  ).join('\n');
+  if (STATE.category === 'characters') {
+    modeName = "Personagens";
+    const emojiMap = { correct: '🟩', partial: '🟨', incorrect: '🟥' };
+    const fields = ['type','game','height','weight','weapon','race','gender'];
+    lines = STATE.guesses.map(g =>
+      fields.map(f => emojiMap[g.comparison[f].result]).join('')
+    ).join('\n');
+  } else {
+    modeName = STATE.category === 'items' ? 'Itens' : STATE.category === 'scenery' ? 'Cenário' : 'Música';
+    lines = STATE.guesses.map(g => g.correct ? '🟩' : '🟥').join('');
+  }
 
   const today = new Date();
   const dateStr = today.toLocaleDateString('pt-BR');
 
-  const text = `🔥 Dark Souls — Who Am I? (${dateStr})\n${lines}\n${STATE.guesses.length} tentativa${STATE.guesses.length !== 1 ? 's' : ''}\n#DarkSoulsQuiz`;
+  const text = `🔥 Dark Souls DLE — ${modeName} (${dateStr})\n${lines}\n${STATE.guesses.length} tentativa${STATE.guesses.length !== 1 ? 's' : ''}\n#DarkSoulsQuiz`;
 
   if (navigator.share) {
     navigator.share({ title: 'Dark Souls Who Am I?', text }).catch(() => {});
@@ -399,26 +588,26 @@ function showToast(msg) {
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'toast';
-    toast.setAttribute('role', 'status');
-    toast.setAttribute('aria-live', 'polite');
+    toast.style = "position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);color:var(--gold);padding:0.8rem 1.5rem;border-radius:30px;border:1px solid var(--gold-dim);z-index:1000;opacity:0;transition:opacity 0.3s;pointer-events:none;font-family:var(--font-title);";
     document.body.appendChild(toast);
   }
   toast.textContent = msg;
-  toast.classList.add('toast-visible');
-  setTimeout(() => toast.classList.remove('toast-visible'), 2500);
+  toast.style.opacity = '1';
+  setTimeout(() => toast.style.opacity = '0', 2500);
 }
 
 // ─── Persistência ─────────────────────────────────────────────────────────────
 function getTodayKey() {
   const d = new Date();
-  return `dsq_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const base = `dsq_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  return `${base}_${STATE.category}`;
 }
 
 function saveProgress() {
   const data = {
-    guessedIds: [...STATE.guessedIds],
-    guesses: STATE.guesses.map(g => ({ charId: g.char.id })),
-    won: STATE.won
+    guesses: STATE.guesses,
+    won: STATE.won,
+    zoom: STATE.zoomLevel
   };
   localStorage.setItem(getTodayKey(), JSON.stringify(data));
 }
@@ -428,11 +617,32 @@ function loadProgress() {
     const raw = localStorage.getItem(getTodayKey());
     if (!raw) return;
     const data = JSON.parse(raw);
-    data.guesses.forEach(g => {
-      const char = CHARACTERS.find(c => c.id === g.charId);
-      if (char) submitGuess(char.id, true);
-    });
-  } catch {}
+    
+    STATE.zoomLevel = data.zoom || 4;
+    if (STATE.category === 'scenery') updateVisualZoom();
+
+    if (data.guesses && data.guesses.length > 0) {
+      const pool = getCategoryPool();
+      data.guesses.forEach(g => {
+        if (STATE.category === 'characters') {
+          submitGuess(g.charId || g.char?.id, true);
+        } else {
+          // No modo desafio visual/audio, o guess é um objeto {name, correct}
+          addHistoryItem(g);
+          STATE.guesses.push(g);
+          
+          // Popula guessedIds para que não apareçam no autocomplete
+          const item = pool.find(i => normalizeText(i.name) === normalizeText(g.name));
+          if (item) STATE.guessedIds.add(item.id);
+
+          if (g.correct) STATE.won = true;
+        }
+      });
+      
+      if (STATE.won) showVictoryModal(STATE.target);
+      else if (STATE.guesses.length >= STATE.maxGuesses) showDefeatModal();
+    }
+  } catch(e) { console.error(e); }
 }
 
 // ─── Partículas de cinza ──────────────────────────────────────────────────────
@@ -512,19 +722,111 @@ function initParticles() {
   animate();
 }
 
+// ─── Menu de Categorias ───────────────────────────────────────────────────────
+function initCategoryMenu() {
+  const cards = EL.menuCards();
+  const backBtn = EL.btnBack();
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const category = card.dataset.category;
+      initMode(category);
+    });
+  });
+
+  backBtn.addEventListener('click', () => {
+    EL.gameContent().classList.add('hidden');
+    EL.idleScreen().classList.remove('hidden');
+    
+    // Reset áudio se estiver tocando
+    const audio = EL.gameAudio();
+    if (audio) {
+      audio.pause();
+      STATE.isAudioPlaying = false;
+      EL.playIcon().textContent = '▶️';
+      EL.playLabel().textContent = 'Ouvir (15s)';
+      if (STATE.audioTimer) {
+        clearTimeout(STATE.audioTimer);
+        STATE.audioTimer = null;
+      }
+    }
+  });
+}
+
+function initMode(category) {
+  // Parar qualquer áudio se mudar de modo
+  if (STATE.category === 'music') {
+    const audio = EL.gameAudio();
+    if (audio) {
+      audio.pause();
+      STATE.isAudioPlaying = false;
+      if (STATE.audioTimer) clearTimeout(STATE.audioTimer);
+    }
+  }
+
+  STATE.category = category;
+  STATE.guesses = [];
+  STATE.guessedIds = new Set();
+  STATE.won = false;
+  STATE.zoomLevel = 4;
+  
+  // Limpar interface
+  EL.guessesArea().innerHTML = '';
+  EL.histList().innerHTML = '';
+  EL.input().value = '';
+  EL.input().disabled = false;
+  
+  // Selecionar alvo do dia
+  STATE.target = getDailyTarget(category);
+  
+  // Ajustar UI conforme modo
+  const isChar = category === 'characters';
+  const isVisual = category === 'items' || category === 'scenery';
+  const isMusic = category === 'music';
+  
+  EL.charTable().classList.toggle('hidden', !isChar);
+  EL.vChallenge().classList.toggle('hidden', !isVisual);
+  EL.aChallenge().classList.toggle('hidden', !isMusic);
+  EL.simpleHist().classList.toggle('hidden', isChar);
+  EL.legend().classList.toggle('hidden', !isChar);
+  
+  if (isChar) {
+    EL.instruction().textContent = 'Adivinhe o personagem do dia. Digite um nome para começar.';
+    EL.input().placeholder = 'Digite o nome de um personagem...';
+  } else if (category === 'items') {
+    EL.instruction().textContent = 'Reconheça o item da imagem.';
+    EL.input().placeholder = 'Que item é este?';
+    EL.imgTarget().src = STATE.target.image;
+    EL.imgTarget().style.transform = 'scale(1)';
+  } else if (category === 'scenery') {
+    EL.instruction().textContent = 'Identifique o local. O zoom diminui a cada erro.';
+    EL.input().placeholder = 'Que lugar é este?';
+    EL.imgTarget().src = STATE.target.image;
+    updateVisualZoom();
+  } else if (isMusic) {
+    EL.instruction().textContent = 'Sinfonia da Morte. Identifique o tema em 15 segundos.';
+    EL.input().placeholder = 'Que música é esta?';
+    EL.gameAudio().src = STATE.target.audio;
+    updateAudioProgress();
+  }
+
+  EL.idleScreen().classList.add('hidden');
+  EL.gameContent().classList.remove('hidden');
+  EL.input().focus();
+  
+  loadProgress();
+}
+
 // ─── Inicialização ────────────────────────────────────────────────────────────
 function init() {
-  // Verifica preferência de movimento
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reduceMotion) initParticles();
 
-  STATE.target = getDailyCharacter();
-
   initInputEvents();
-  loadProgress();
-
-  // Foco inicial no input
-  EL.input().focus();
+  initCategoryMenu();
+  
+  // Verifica se há progresso em alguma categoria e restaura se necessário
+  // mas aqui deixamos o usuário escolher no menu inicial a menos que queira auto-load
 }
 
 document.addEventListener('DOMContentLoaded', init);

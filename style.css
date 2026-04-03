@@ -118,6 +118,163 @@ body {
   100% { transform: scaleX(0.94) scaleY(1.04) rotate(1.5deg); }
 }
 
+/* ─── Utilitários ─────────────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ─── Menu Inicial (Idle Screen) ──────────────────────────────────────────── */
+.idle-screen {
+  width: 100%;
+  max-width: 900px;
+  padding: 3rem 1.5rem;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.menu-prompt {
+  font-family: var(--font-title);
+  color: var(--text-dim);
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.menu-card {
+  background: #080810;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+.card-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease, filter 0.5s ease;
+  filter: brightness(0.5) contrast(1.1);
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, 
+    rgba(8, 8, 16, 0.95) 0%, 
+    rgba(8, 8, 16, 0.4) 50%, 
+    rgba(8, 8, 16, 0.7) 100%);
+  z-index: 1;
+  transition: opacity 0.4s ease;
+}
+
+.menu-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--gold);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 20px rgba(200, 169, 110, 0.2);
+}
+
+.menu-card:hover .card-image img {
+  transform: scale(1.1);
+  filter: brightness(0.65) contrast(1.2);
+}
+
+.menu-card:hover .card-overlay {
+  background: linear-gradient(to top, 
+    rgba(8, 8, 16, 1) 0%, 
+    rgba(8, 8, 16, 0.3) 50%, 
+    rgba(8, 8, 16, 0.5) 100%);
+}
+
+.card-icon {
+  font-size: 2.2rem;
+  z-index: 2;
+  transition: transform 0.4s ease;
+  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.card-title {
+  font-family: var(--font-title);
+  color: var(--gold);
+  font-size: 1.5rem;
+  letter-spacing: 0.1em;
+  z-index: 2;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+.card-desc {
+  font-size: 0.85rem;
+  color: #c4b5a9;
+  font-style: italic;
+  line-height: 1.4;
+  z-index: 2;
+  text-shadow: 0 1px 5px rgba(0,0,0,0.8);
+  max-width: 180px;
+}
+
+/* ─── Conteúdo do Jogo ─────────────────────────────────────────────────────── */
+.game-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.btn-back {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  border-color: var(--gold-dim);
+  color: var(--text);
+  background: var(--bg-card);
+}
+
 /* ─── Instruções e Legenda ───────────────────────────────────────────────── */
 .instructions {
   max-width: 760px;
@@ -432,9 +589,9 @@ body {
 /* ─── Lista de Sugestões ──────────────────────────────────────────────────── */
 .suggestion-list {
   position: absolute;
-  top: calc(100% - 4px);
-  left: 1rem;
-  right: 1rem;
+  top: 100%;
+  left: 0;
+  right: 0;
   background: #14141f;
   border: 1px solid var(--border-glow);
   border-top: none;
@@ -446,6 +603,7 @@ body {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--gold-dim) transparent;
+  z-index: 1000;
 }
 
 .suggestion-list.hidden { display: none; }
@@ -626,5 +784,215 @@ body {
   font-size: 0.85rem;
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
+}
 
+.btn-modal-close:hover {
+  border-color: var(--gold-dim);
+  color: var(--text);
+  background: var(--bg-card);
+}
+
+.modal-next {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+/* ─── Desafio Visual (Itens e Cenário) ────────────────────────────────────── */
+.visual-challenge {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+  perspective: 1000px;
+}
+
+.challenge-image-container {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(200, 169, 110, 0.1);
+}
+
+#challengeImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: brightness(0.9) contrast(1.1);
+}
+
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+
+/* ─── Desafio de Áudio (Música) ───────────────────────────────────────────── */
+.audio-challenge {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+.music-card {
+  background: linear-gradient(135deg, #10101c 0%, #080810 100%);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.music-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(200,169,110,0.05) 0%, transparent 70%);
+  z-index: 0;
+}
+
+.music-icon {
+  font-size: 3.5rem;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(200,169,110,0.4);
+  z-index: 1;
+  animation: pulseMusic 2s ease-in-out infinite;
+}
+
+@keyframes pulseMusic {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.1); filter: brightness(1.2); }
+}
+
+.music-controls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  z-index: 1;
+}
+
+.btn-play {
+  background: var(--bg-hover);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  padding: 0.8rem 2rem;
+  border-radius: 30px;
+  font-family: var(--font-title);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: all 0.3s;
+}
+
+.btn-play:hover {
+  background: var(--gold-dim);
+  color: var(--text-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(200,169,110,0.3);
+}
+
+.btn-play:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.audio-progress {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+  transition: width 0.1s linear;
+}
+
+/* ─── Histórico Simples ──────────────────────────────────────────────────── */
+.simple-history {
+  width: 100%;
+  max-width: 600px;
+  padding: 0 1rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0.8rem 1.2rem;
+  border-radius: var(--radius);
+  animation: slideInUp 0.4s ease both;
+}
+
+.history-item.correct {
+  border-color: var(--correct-bd);
+  background: var(--correct-bg);
+}
+
+.history-item.incorrect {
+  border-color: var(--incorrect-bd);
+  background: var(--incorrect-bg);
+}
+
+.history-status {
+  font-size: 1.2rem;
+}
+
+.history-name {
+  font-family: var(--font-title);
+  font-size: 1rem;
+  color: var(--text);
+  flex-grow: 1;
+}
+
+.history-result {
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.history-item.correct .history-result { color: var(--correct-text); }
+.history-item.incorrect .history-result { color: var(--incorrect-text); }
+
+/* ─── Responsivo ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .visual-challenge, .audio-challenge {
+    padding: 0 1rem;
+  }
 }

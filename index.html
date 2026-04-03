@@ -32,67 +32,152 @@
       </div>
     </header>
 
-    <!-- INSTRUÇÃO -->
-    <section class="instructions" aria-label="Instruções">
-      <p>
-        Adivinhe o personagem do dia. Digite um nome para começar.
-        As cores indicam o quão próxima foi sua tentativa.
-      </p>
-      <div class="legend" role="list" aria-label="Legenda de cores">
-        <div class="legend-item" role="listitem">
-          <span class="legend-dot correct" aria-hidden="true"></span>
-          <span>Correto</span>
-        </div>
-        <div class="legend-item" role="listitem">
-          <span class="legend-dot partial" aria-hidden="true"></span>
-          <span>Próximo</span>
-        </div>
-        <div class="legend-item" role="listitem">
-          <span class="legend-dot incorrect" aria-hidden="true"></span>
-          <span>Errado</span>
+    <!-- MENU INICIAL (IDLE) -->
+    <section id="idleScreen" class="idle-screen">
+      <div class="menu-container">
+        <h2 class="menu-prompt">Selecione o seu desafio</h2>
+        <div class="category-grid">
+          <button class="menu-card" data-category="characters">
+            <div class="card-image">
+              <img src="imgs/personagens1 (1).jpg" alt="" aria-hidden="true" />
+            </div>
+            <div class="card-overlay"></div>
+            <span class="card-icon">🛡️</span>
+            <span class="card-title">Personagens</span>
+            <span class="card-desc">Adivinhe heróis e vilões de Lordran</span>
+          </button>
+          <button class="menu-card" data-category="items">
+            <div class="card-image">
+              <img src="imgs/itens (1).jpg" alt="" aria-hidden="true" />
+            </div>
+            <div class="card-overlay"></div>
+            <span class="card-icon">⚔️</span>
+            <span class="card-title">Itens</span>
+            <span class="card-desc">Equipamentos, anéis e tesouros</span>
+          </button>
+          <button class="menu-card" data-category="scenery">
+            <div class="card-image">
+              <img src="imgs/cenário (1).jpg" alt="" aria-hidden="true" />
+            </div>
+            <div class="card-overlay"></div>
+            <span class="card-icon">🏰</span>
+            <span class="card-title">Cenário</span>
+            <span class="card-desc">Locais icônicos das Terras Intermédias</span>
+          </button>
+          <button class="menu-card" data-category="music">
+            <div class="card-image">
+              <img src="imgs/Música (1).jpg" alt="" aria-hidden="true" />
+            </div>
+            <div class="card-overlay"></div>
+            <span class="card-icon">🎶</span>
+            <span class="card-title">Música</span>
+            <span class="card-desc">Trilhas épicas dos chefes</span>
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- BUSCA / INPUT -->
-    <div class="search-container" id="searchContainer" role="search" aria-label="Buscar personagem">
-      <div class="search-wrapper">
-        <input
-          type="text"
-          id="searchInput"
-          class="search-input"
-          placeholder="Digite o nome de um personagem..."
-          autocomplete="off"
-          aria-label="Nome do personagem"
-          aria-autocomplete="list"
-          aria-controls="suggestionList"
-          aria-expanded="false"
-        />
-        <span class="search-icon" aria-hidden="true">⚔️</span>
+    <!-- CONTEÚDO DO JOGO -->
+    <div id="gameContent" class="game-content hidden">
+      <!-- BOTÃO VOLTAR -->
+      <button id="btnBackToMenu" class="btn-back" aria-label="Voltar ao menu">
+        <span aria-hidden="true">←</span> Menu
+      </button>
+
+      <!-- INSTRUÇÃO -->
+      <section class="instructions" id="gameInstructions" aria-label="Instruções">
+        <p id="instructionText">
+          Adivinhe o personagem do dia. Digite um nome para começar.
+          As cores indicam o quão próxima foi sua tentativa.
+        </p>
+        <div class="legend" id="gameLegend" role="list" aria-label="Legenda de cores">
+          <div class="legend-item" role="listitem">
+            <span class="legend-dot correct" aria-hidden="true"></span>
+            <span>Correto</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <span class="legend-dot partial" aria-hidden="true"></span>
+            <span>Próximo</span>
+          </div>
+          <div class="legend-item" role="listitem">
+            <span class="legend-dot incorrect" aria-hidden="true"></span>
+            <span>Errado</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- DESAFIO VISUAL (ITENS E CENÁRIO) -->
+      <section id="visualChallenge" class="visual-challenge hidden">
+        <div class="challenge-image-container">
+          <img id="challengeImage" src="" alt="Desafio Visual" />
+          <div id="imageOverlay" class="image-overlay"></div>
+        </div>
+      </section>
+
+      <!-- DESAFIO DE ÁUDIO (MÚSICA) -->
+      <section id="audioChallenge" class="audio-challenge hidden">
+        <div class="music-card">
+          <div class="music-icon">🎵</div>
+          <div class="music-controls">
+            <button id="btnPlayMusic" class="btn-play">
+              <span id="playIcon">▶️</span>
+              <span id="playLabel">Ouvir (15s)</span>
+            </button>
+            <div class="audio-progress">
+              <div id="audioProgressBar" class="progress-bar"></div>
+            </div>
+          </div>
+          <audio id="gameAudio" preload="auto"></audio>
+        </div>
+      </section>
+
+      <!-- BUSCA / INPUT -->
+      <div class="search-container" id="searchContainer" role="search" aria-label="Buscar">
+        <div class="search-wrapper">
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Digite sua resposta..."
+            autocomplete="off"
+            aria-label="Resposta"
+            aria-autocomplete="list"
+            aria-controls="suggestionList"
+            aria-expanded="false"
+          />
+          <span class="search-icon" aria-hidden="true">⚔️</span>
+          <ul
+            class="suggestion-list hidden"
+            id="suggestionList"
+            role="listbox"
+            aria-label="Sugestões"
+          ></ul>
+        </div>
       </div>
-      <ul
-        class="suggestion-list hidden"
-        id="suggestionList"
-        role="listbox"
-        aria-label="Sugestões de personagens"
-      ></ul>
-    </div>
 
-    <!-- COLUNA DE LABELS -->
-    <div class="column-labels" aria-hidden="true">
-      <div class="col-label col-image">Personagem</div>
-      <div class="col-label col-type">Tipo</div>
-      <div class="col-label col-game">Jogo</div>
-      <div class="col-label col-height">Altura</div>
-      <div class="col-label col-weight">Peso</div>
-      <div class="col-label col-weapon">Arma</div>
-      <div class="col-label col-race">Raça</div>
-      <div class="col-label col-gender">Sexo</div>
-    </div>
+      <!-- TABELA DE COMPARAÇÃO (PERSONAGENS) -->
+      <div id="characterTable" class="hidden">
+        <div class="column-labels" aria-hidden="true">
+          <div class="col-label col-image">Personagem</div>
+          <div class="col-label col-type">Tipo</div>
+          <div class="col-label col-game">Jogo</div>
+          <div class="col-label col-height">Altura</div>
+          <div class="col-label col-weight">Peso</div>
+          <div class="col-label col-weapon">Arma</div>
+          <div class="col-label col-race">Raça</div>
+          <div class="col-label col-gender">Sexo</div>
+        </div>
 
-    <!-- ÁREA DE TENTATIVAS -->
-    <main class="guesses-area" id="guessesArea" role="main" aria-label="Tentativas anteriores" aria-live="polite">
-    </main>
+        <!-- ÁREA DE TENTATIVAS -->
+        <main class="guesses-area" id="guessesArea" role="main" aria-label="Tentativas anteriores" aria-live="polite">
+        </main>
+      </div>
+
+      <!-- HISTÓRICO SIMPLES (OUTROS MODOS) -->
+      <div id="simpleHistory" class="simple-history hidden">
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </div>
 
 
 
@@ -127,6 +212,7 @@
   </div>
 
   <script src="data/characters.js"></script>
+  <script src="data/game_data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
