@@ -7,10 +7,11 @@ const STATE = {
   guesses:   [],
   guessedIds: new Set(),
   won:       false,
-  maxGuesses: 10,
+  maxGuesses: 15,    // Aumentado para acomodar a dica
   zoomLevel: 4,      // Para o modo Cenário
   isAudioPlaying: false,
-  audioTimer:    null
+  audioTimer:    null,
+  hintUsed:      false
 };
 
 // ─── Cache de elementos ───────────────────────────────────────────────────────
@@ -42,10 +43,67 @@ const EL = {
   playIcon:    () => document.getElementById('playIcon'),
   playLabel:   () => document.getElementById('playLabel'),
   progressBar: () => document.getElementById('audioProgressBar'),
+
+  // Elementos da Dica
+  hintModal:   () => document.getElementById('hintModal'),
+  hintText:    () => document.getElementById('hintText'),
+  hintContent: () => document.getElementById('hintContent'),
+  hintActions: () => document.getElementById('hintActions'),
+  hintClose:   () => document.getElementById('hintCloseAction'),
 };
+
+// ─── Lógica de Dicas ──────────────────────────────────────────────────────────
+function showHintRequestModal() {
+  if (STATE.hintUsed) return;
+  
+  const modal = EL.hintModal();
+  if (!modal) return;
+
+  EL.hintContent().classList.add('hidden');
+  EL.hintActions().classList.remove('hidden');
+  EL.hintClose().classList.add('hidden');
+  
+  modal.classList.remove('hidden');
+  
+  document.getElementById('btnAcceptHint').onclick = () => {
+    STATE.hintUsed = true;
+    EL.hintText().textContent = getHintText();
+    EL.hintContent().classList.remove('hidden');
+    EL.hintActions().classList.add('hidden');
+    EL.hintClose().classList.remove('hidden');
+    saveProgress();
+  };
+  
+  document.getElementById('btnDeclineHint').onclick = () => {
+    modal.classList.add('hidden');
+    STATE.hintUsed = true; // Marca como usado mesmo que negue, para não repetir
+    saveProgress();
+  };
+
+  document.getElementById('btnCloseHintModal').onclick = () => {
+    modal.classList.add('hidden');
+  };
+}
+
+function getHintText() {
+  const t = STATE.target;
+  if (STATE.category === 'characters') {
+    return `DICA: Este personagem é da raça "${t.race}" e sua arma principal é "${t.weapon}".`;
+  } else if (STATE.category === 'items' || STATE.category === 'scenery') {
+    return `DICA: O nome começa com a letra "${t.name.charAt(0)}" e é classificado como "${t.type}".`;
+  } else if (STATE.category === 'music') {
+    const gameHint = t.name.includes('DS1') || t.name.includes('Souls I') ? 'Dark Souls I' 
+                   : t.name.includes('DS3') || t.name.includes('Souls III') ? 'Dark Souls III' 
+                   : t.name.includes('Majula') || t.name.includes('DS2') ? 'Dark Souls II' 
+                   : 'Bloodborne';
+    return `DICA: Esta trilha sonora pertence ao jogo "${gameHint}".`;
+  }
+  return "DICA: Continue tentando, Undead!";
+}
 
 // ─── Utilitários ──────────────────────────────────────────────────────────────
 function normalizeText(text) {
+  if (!text) return "";
   return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 }
 
@@ -159,6 +217,11 @@ function submitGuess(value, isInitialLoad = false) {
     handleChallengeGuess(value, isInitialLoad);
   }
 
+  // Verifica gatilho de dica (ao atingir 10 erros ou mais)
+  if (!STATE.won && STATE.guesses.length >= 10 && !STATE.hintUsed && !isInitialLoad) {
+    setTimeout(showHintRequestModal, 1000);
+  }
+
   if (!isInitialLoad) {
     EL.input().value = '';
     closeSuggestions();
@@ -227,10 +290,11 @@ function handleChallengeGuess(guessName, isInitialLoad) {
   if (isCorrect) {
     STATE.won = true;
     const delay = isInitialLoad ? 0 : 500;
-    setTimeout(() => showVictoryModal(STATE.target), delay);
+    const currentTarget = STATE.target; // Trava o alvo atual para o modal
+    setTimeout(() => showVictoryModal(currentTarget), delay);
   } else {
-    // Reduz zoom no modo cenário se este ainda for o caso
-    if (STATE.category === 'scenery') {
+    // Reduz zoom nos modos visuais se este ainda for o caso
+    if (STATE.category === 'scenery' || STATE.category === 'items') {
       STATE.zoomLevel = Math.max(1, STATE.zoomLevel - 0.5);
       updateVisualZoom();
     }
@@ -281,6 +345,14 @@ function filterSuggestions(query) {
   return pool.filter(item => {
     const itemName = normalizeText(item.name);
     return !STATE.guessedIds.has(item.id) && itemName.includes(q);
+  }).sort((a, b) => {
+    const nameA = normalizeText(a.name);
+    const nameB = normalizeText(b.name);
+    const startsA = nameA.startsWith(q);
+    const startsB = nameB.startsWith(q);
+    if (startsA && !startsB) return -1;
+    if (!startsA && startsB) return 1;
+    return nameA.localeCompare(nameB);
   }).slice(0, 8);
 }
 
@@ -299,7 +371,7 @@ function renderSuggestions(matches) {
     characters: '👤',
     items: '🏺',
     scenery: '🏰',
-    music: '🎵'
+    music: '<img src="imgs/Solaris-Photoroom.png" style="width:24px; vertical-align:middle;">'
   };
 
   matches.forEach((item, i) => {
@@ -309,11 +381,19 @@ function renderSuggestions(matches) {
     li.setAttribute('id', `suggestion-${i}`);
     li.setAttribute('aria-selected', 'false');
     
-    const emoji = item.emoji || defaultEmojis[STATE.category];
+    // Prioriza imagem, depois emoji, depois default
+    let visualHtml = '';
+    if (item.image) {
+      visualHtml = `<img src="${item.image}" alt="" class="sug-img-preview" />`;
+    } else {
+      const emoji = item.emoji || defaultEmojis[STATE.category];
+      visualHtml = `<span class="sug-emoji-preview">${emoji}</span>`;
+    }
+
     const meta = item.game ? `${item.game} · ${item.type}` : (item.type || '');
 
     li.innerHTML = `
-      <span class="sug-avatar" aria-hidden="true">${emoji}</span>
+      <div class="sug-avatar" aria-hidden="true">${visualHtml}</div>
       <div class="sug-info">
         <span class="sug-name">${highlightMatch(item.name, EL.input().value)}</span>
         <span class="sug-meta">${meta}</span>
@@ -457,6 +537,25 @@ function updateAudioProgress() {
 }
 
 // ─── Modais ───────────────────────────────────────────────────────────────────
+const CATEGORY_ORDER = ['characters', 'items', 'scenery', 'music'];
+
+function navigateToNextMode() {
+  const currentIndex = CATEGORY_ORDER.indexOf(STATE.category);
+  const nextIndex = currentIndex + 1;
+  
+  // Esconde o modal atual
+  EL.modal().classList.add('hidden');
+
+  if (nextIndex < CATEGORY_ORDER.length) {
+    // Vai para a próxima categoria
+    initMode(CATEGORY_ORDER[nextIndex]);
+  } else {
+    // Se era a última, volta para o menu
+    EL.gameContent().classList.add('hidden');
+    EL.idleScreen().classList.remove('hidden');
+  }
+}
+
 function showVictoryModal(target) {
   const messages = [
     "Você acendeu a fogueira!",
@@ -470,14 +569,34 @@ function showVictoryModal(target) {
   document.getElementById('victoryTitle').textContent = 'Fogueira Acesa!';
   EL.modalSub().textContent = `${msg} — ${STATE.guesses.length} tentativa${STATE.guesses.length !== 1 ? 's' : ''}`;
   
-  const displayEmoji = target.emoji || (STATE.category === 'music' ? '🎵' : STATE.category === 'items' ? '⚔️' : '🏰');
+  const isMusic = STATE.category === 'music';
+  const isVisual = STATE.category === 'items' || STATE.category === 'scenery';
+  
+  // Define o que mostrar visualmente (Imagem ou Emoji/Solaire)
+  let visualContent = '';
+  if (target.image) {
+    visualContent = `
+      <div class="char-avatar" aria-hidden="true" style="width: 80px; height: 80px; margin-bottom: 0.5rem; border: 2px solid var(--gold-dim);">
+        <img src="${target.image}" alt="${target.name}" class="char-img" style="border-radius: 50%; width: 100%; height: 100%; object-fit: cover;" />
+      </div>`;
+  } else if (isMusic) {
+    visualContent = `
+      <div class="char-avatar" aria-hidden="true" style="width: 80px; height: 80px; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center;">
+        <img src="imgs/Solaris-Photoroom.png" alt="Solaire" style="width: 100%; height: auto;" />
+      </div>`;
+  } else {
+    const displayEmoji = target.emoji || (STATE.category === 'items' ? '🏺' : '🏰');
+    visualContent = `<span class="modal-char-emoji" aria-hidden="true" style="font-size: 3rem;">${displayEmoji}</span>`;
+  }
+
+  // Define os metadados (Tipo, Jogo, etc)
   const displayMeta = target.game ? `${target.type} · ${target.game}` : (target.type || '');
 
   EL.modalChar().innerHTML = `
-    <div class="modal-char-display">
-      <span class="modal-char-emoji" aria-hidden="true">${displayEmoji}</span>
-      <span class="modal-char-name">${target.name}</span>
-      <span class="modal-char-meta">${displayMeta}</span>
+    <div class="modal-char-display" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+      ${visualContent}
+      <span class="modal-char-name" style="font-size: 1.5rem; color: var(--gold); font-weight: bold;">${target.name}</span>
+      <span class="modal-char-meta" style="font-size: 0.9rem; opacity: 0.8;">${displayMeta}</span>
     </div>
   `;
 
@@ -493,9 +612,7 @@ function showVictoryModal(target) {
   modal.classList.remove('hidden');
   modal.focus();
 
-  document.getElementById('btnCloseModal').addEventListener('click', () => {
-    modal.classList.add('hidden');
-  }, { once: true });
+  document.getElementById('btnCloseModal').onclick = navigateToNextMode;
 
   document.getElementById('btnShare').addEventListener('click', shareResult, { once: true });
 
@@ -508,14 +625,34 @@ function showDefeatModal() {
   EL.modalSub().textContent = `Você foi derrotado. A resposta era...`;
   
   const target = STATE.target;
-  const displayEmoji = target.emoji || (STATE.category === 'music' ? '🎵' : STATE.category === 'items' ? '⚔️' : '🏰');
+  const isMusic = STATE.category === 'music';
+  const isVisual = STATE.category === 'items' || STATE.category === 'scenery';
+  
+  // Define o que mostrar visualmente (Imagem ou Emoji/Solaire)
+  let visualContent = '';
+  if (target.image) {
+    visualContent = `
+      <div class="char-avatar" aria-hidden="true" style="width: 80px; height: 80px; margin-bottom: 0.5rem; border: 2px solid var(--gold-dim);">
+        <img src="${target.image}" alt="${target.name}" class="char-img" style="border-radius: 50%; width: 100%; height: 100%; object-fit: cover;" />
+      </div>`;
+  } else if (isMusic) {
+    visualContent = `
+      <div class="char-avatar" aria-hidden="true" style="width: 80px; height: 80px; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center;">
+        <img src="imgs/Solaris-Photoroom.png" alt="Solaire" style="width: 100%; height: auto;" />
+      </div>`;
+  } else {
+    const displayEmoji = target.emoji || (STATE.category === 'items' ? '🏺' : '🏰');
+    visualContent = `<span class="modal-char-emoji" aria-hidden="true" style="font-size: 3rem;">${displayEmoji}</span>`;
+  }
+
+  // Define os metadados (Tipo, Jogo, etc)
   const displayMeta = target.game ? `${target.type} · ${target.game}` : (target.type || '');
 
   EL.modalChar().innerHTML = `
-    <div class="modal-char-display">
-      <span class="modal-char-emoji" aria-hidden="true">${displayEmoji}</span>
-      <span class="modal-char-name">${target.name}</span>
-      <span class="modal-char-meta">${displayMeta}</span>
+    <div class="modal-char-display" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+      ${visualContent}
+      <span class="modal-char-name" style="font-size: 1.5rem; color: var(--gold); font-weight: bold;">${target.name}</span>
+      <span class="modal-char-meta" style="font-size: 0.9rem; opacity: 0.8;">${displayMeta}</span>
     </div>
   `;
   document.getElementById('victoryTitle').textContent = 'A Chama se Apagou';
@@ -527,9 +664,7 @@ function showDefeatModal() {
   modal.classList.remove('hidden');
   EL.input().disabled = true;
 
-  document.getElementById('btnCloseModal').addEventListener('click', () => {
-    modal.classList.add('hidden');
-  }, { once: true });
+  document.getElementById('btnCloseModal').onclick = navigateToNextMode;
 }
 
 let countdownInterval = null;
@@ -605,6 +740,7 @@ function getTodayKey() {
 
 function saveProgress() {
   const data = {
+    targetId: STATE.target.id,
     guesses: STATE.guesses,
     won: STATE.won,
     zoom: STATE.zoomLevel
@@ -618,14 +754,31 @@ function loadProgress() {
     if (!raw) return;
     const data = JSON.parse(raw);
     
+    // Se o alvo mudou (por update de código ou novo dia), limpa progresso antigo
+    if (data.targetId && data.targetId !== STATE.target.id) {
+      localStorage.removeItem(getTodayKey());
+      return;
+    }
+
     STATE.zoomLevel = data.zoom || 4;
-    if (STATE.category === 'scenery') updateVisualZoom();
+    if (STATE.category === 'scenery' || STATE.category === 'items') updateVisualZoom();
 
     if (data.guesses && data.guesses.length > 0) {
       const pool = getCategoryPool();
       data.guesses.forEach(g => {
         if (STATE.category === 'characters') {
-          submitGuess(g.charId || g.char?.id, true);
+          // Recria as linhas da tabela para personagens
+          const char = CHARACTERS.find(c => c.id === (g.charId || g.char?.id));
+          if (char) {
+            STATE.guessedIds.add(char.id);
+            const comparison = compareCharacter(char, STATE.target);
+            const row = createGuessRow(char, comparison, STATE.guesses.length);
+            const area = EL.guessesArea();
+            area.insertBefore(row, area.firstChild);
+            row.classList.add('revealed');
+            STATE.guesses.push({ char, comparison });
+            if (char.id === STATE.target.id) STATE.won = true;
+          }
         } else {
           // No modo desafio visual/audio, o guess é um objeto {name, correct}
           addHistoryItem(g);
@@ -639,8 +792,12 @@ function loadProgress() {
         }
       });
       
-      if (STATE.won) showVictoryModal(STATE.target);
-      else if (STATE.guesses.length >= STATE.maxGuesses) showDefeatModal();
+      if (STATE.won) {
+        const currentTarget = STATE.target;
+        showVictoryModal(currentTarget);
+      } else if (STATE.guesses.length >= STATE.maxGuesses) {
+        showDefeatModal();
+      }
     }
   } catch(e) { console.error(e); }
 }
@@ -793,14 +950,10 @@ function initMode(category) {
   if (isChar) {
     EL.instruction().textContent = 'Adivinhe o personagem do dia. Digite um nome para começar.';
     EL.input().placeholder = 'Digite o nome de um personagem...';
-  } else if (category === 'items') {
-    EL.instruction().textContent = 'Reconheça o item da imagem.';
-    EL.input().placeholder = 'Que item é este?';
-    EL.imgTarget().src = STATE.target.image;
-    EL.imgTarget().style.transform = 'scale(1)';
-  } else if (category === 'scenery') {
-    EL.instruction().textContent = 'Identifique o local. O zoom diminui a cada erro.';
-    EL.input().placeholder = 'Que lugar é este?';
+  } else if (category === 'items' || category === 'scenery') {
+    const msg = category === 'items' ? 'Reconheça o item da imagem.' : 'Identifique o local.';
+    EL.instruction().textContent = `${msg} O zoom diminui a cada erro.`;
+    EL.input().placeholder = category === 'items' ? 'Que item é este?' : 'Que lugar é este?';
     EL.imgTarget().src = STATE.target.image;
     updateVisualZoom();
   } else if (isMusic) {

@@ -21,14 +21,14 @@
     <!-- CABEÇALHO -->
     <header class="site-header" role="banner">
       <div class="header-flame" aria-hidden="true">
-        <div class="flame"></div>
+        <img src="imgs/dark-souls-bonfire.gif" alt="Bonfire" class="header-gif">
       </div>
       <div class="header-text">
         <h1 class="site-title">Dark Souls</h1>
         <span class="site-subtitle">WHO AM I?</span>
       </div>
       <div class="header-flame" aria-hidden="true">
-        <div class="flame"></div>
+        <img src="imgs/dark-souls-bonfire.gif" alt="Bonfire" class="header-gif">
       </div>
     </header>
 
@@ -117,7 +117,9 @@
       <!-- DESAFIO DE ÁUDIO (MÚSICA) -->
       <section id="audioChallenge" class="audio-challenge hidden">
         <div class="music-card">
-          <div class="music-icon">🎵</div>
+          <div class="music-icon">
+            <img src="imgs/Solaris-Photoroom.png" alt="Solaire Music" class="music-img">
+          </div>
           <div class="music-controls">
             <button id="btnPlayMusic" class="btn-play">
               <span id="playIcon">▶️</span>
@@ -191,7 +193,7 @@
     >
       <div class="modal-card">
         <div class="modal-flame" aria-hidden="true">
-          <div class="flame flame-large"></div>
+          <img src="imgs/dark-souls-bonfire.gif" alt="Bonfire" class="header-gif">
         </div>
         <h2 class="modal-title" id="victoryTitle">Fogueira Acesa!</h2>
         <p class="modal-subtitle" id="victorySubtitle"></p>
@@ -206,6 +208,32 @@
           </button>
         </div>
         <p class="modal-next" id="modalNext"></p>
+      </div>
+    </div>
+
+    <!-- MODAL DE DICA -->
+    <div
+      class="modal-overlay hidden"
+      id="hintModal"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="modal-card">
+        <div class="modal-flame" aria-hidden="true">
+          <span style="font-size: 3rem;">💡</span>
+        </div>
+        <h2 class="modal-title">Precisa de uma mão, Undead?</h2>
+        <p class="modal-subtitle">Você já fez 10 tentativas. Deseja uma dica para continuar?</p>
+        <div id="hintContent" class="hidden" style="margin: 1.5rem 0; padding: 1rem; background: rgba(200,169,110,0.1); border: 1px solid var(--gold-dim); border-radius: 8px; color: var(--gold);">
+          <p id="hintText" style="font-style: italic; font-size: 1.1rem;"></p>
+        </div>
+        <div class="modal-actions" id="hintActions">
+          <button class="btn-modal-share" id="btnAcceptHint" style="background: var(--gold); color: #000;">Sim, me ajude</button>
+          <button class="btn-modal-close" id="btnDeclineHint">Não, eu consigo</button>
+        </div>
+        <div class="modal-actions hidden" id="hintCloseAction">
+          <button class="btn-modal-close" id="btnCloseHintModal">Continuar</button>
+        </div>
       </div>
     </div>
 

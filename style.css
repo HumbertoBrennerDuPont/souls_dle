@@ -98,6 +98,12 @@ body {
 }
 
 /* ─── Chama ───────────────────────────────────────────────────────────────── */
+.header-gif {
+  width: 45px;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgba(255, 100, 0, 0.4));
+}
+
 .flame {
   width: 28px;
   height: 44px;
@@ -627,9 +633,27 @@ body {
 
 .sug-avatar {
   font-size: 1.4rem;
-  width: 32px;
+  width: 40px;
+  height: 40px;
   text-align: center;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-glow);
+}
+
+.sug-img-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sug-emoji-preview {
+  font-size: 1.4rem;
 }
 
 .sug-info { display: flex; flex-direction: column; }
@@ -871,6 +895,15 @@ body {
   text-shadow: 0 0 20px rgba(200,169,110,0.4);
   z-index: 1;
   animation: pulseMusic 2s ease-in-out infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.music-img {
+  width: 350px;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgba(200,169,110,0.4));
 }
 
 @keyframes pulseMusic {
