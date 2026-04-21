@@ -5,7 +5,7 @@ const CHARACTERS = [
   {
     id: "artorias",
     name: "Artorias",
-    image: "imgs/artorias_header_full (1).jpg",
+    image: "imgs/personagens/artorias_header_full (1).jpg",
     emoji: "🐺",
     type: "Boss",
     game: "Dark Souls I",
@@ -18,7 +18,7 @@ const CHARACTERS = [
   {
     id: "sif",
     name: "Sif",
-    image: "imgs/Sif.webp",
+    image: "imgs/personagens/Sif.webp",
     emoji: "🐺",
     type: "Boss",
     game: "Dark Souls I",
@@ -31,7 +31,7 @@ const CHARACTERS = [
   {
     id: "ornstein",
     name: "Ornstein",
-    image: "imgs/Ornstein.webp",
+    image: "imgs/personagens/Ornstein.webp",
     emoji: "🐺",
     type: "Boss",
     game: "Dark Souls I",
@@ -44,7 +44,7 @@ const CHARACTERS = [
   {
     id: "smough",
     name: "Smough",
-    image: "imgs/Smough.webp",
+    image: "imgs/personagens/Smough.webp",
     emoji: "🔨",
     type: "Boss",
     game: "Dark Souls I",
@@ -57,7 +57,7 @@ const CHARACTERS = [
   {
     id: "gwyndolin",
     name: "Gwyndolin",
-    image: "imgs/Gwyndolin.webp",
+    image: "imgs/personagens/Gwyndolin.webp",
     emoji: "🌙",
     type: "Boss",
     game: "Dark Souls I",
@@ -70,7 +70,7 @@ const CHARACTERS = [
   {
     id: "gwyn",
     name: "Gwyn",
-    image: "imgs/Gwyn.avif",
+    image: "imgs/personagens/Gwyn.avif",
     emoji: "⚡",
     type: "Boss",
     game: "Dark Souls I",
@@ -83,7 +83,7 @@ const CHARACTERS = [
   {
     id: "solaire",
     name: "Solaire de Astora",
-    image: "imgs/DS1R_Solaire_of_Astora_in_Undead_Burg_(half_body,_front) (1).webp",
+    image: "imgs/personagens/DS1R_Solaire_of_Astora_in_Undead_Burg_(half_body,_front) (1).webp",
     emoji: "☀️",
     type: "NPC",
     game: "Dark Souls I",
@@ -96,7 +96,7 @@ const CHARACTERS = [
   {
     id: "siegmeyer",
     name: "Siegmeyer",
-    image: "imgs/Siegmeyer.webp",
+    image: "imgs/personagens/Siegmeyer.webp",
     emoji: "🛡️",
     type: "NPC",
     game: "Dark Souls I",
@@ -109,7 +109,7 @@ const CHARACTERS = [
   {
     id: "patches",
     name: "Patches",
-    image: "imgs/Patches.webp",
+    image: "imgs/personagens/Patches.webp",
     emoji: "🪝",
     type: "NPC",
     game: "Dark Souls I",
@@ -122,7 +122,7 @@ const CHARACTERS = [
   {
     id: "priscilla",
     name: "Priscilla",
-    image: "imgs/Priscilla.jpg",
+    image: "imgs/personagens/Priscilla.jpg",
     emoji: "❄️",
     type: "Boss",
     game: "Dark Souls I",
@@ -135,7 +135,7 @@ const CHARACTERS = [
   {
     id: "queelag",
     name: "Quelaag",
-    image: "imgs/Quelaag.webp",
+    image: "imgs/personagens/Quelaag.webp",
     emoji: "🕷️",
     type: "Boss",
     game: "Dark Souls I",
@@ -148,7 +148,7 @@ const CHARACTERS = [
   {
     id: "nito",
     name: "Gravelord Nito",
-    image: "imgs/Nito.webp",
+    image: "imgs/personagens/Nito.webp",
     emoji: "💀",
     type: "Boss",
     game: "Dark Souls I",
@@ -161,7 +161,7 @@ const CHARACTERS = [
   {
     id: "seath",
     name: "Seath the Scaleless",
-    image: "imgs/Seth.jpg",
+    image: "imgs/personagens/Seth.jpg",
     emoji: "🐉",
     type: "Boss",
     game: "Dark Souls I",
@@ -174,7 +174,7 @@ const CHARACTERS = [
   {
     id: "vier",
     name: "Four Kings",
-    image: "imgs/FourKings.avif",
+    image: "imgs/personagens/FourKings.avif",
     emoji: "👑",
     type: "Boss",
     game: "Dark Souls I",
@@ -187,7 +187,7 @@ const CHARACTERS = [
   {
     id: "lautrec",
     name: "Lautrec de Carim",
-    image: "imgs/Lautrec.webp",
+    image: "imgs/personagens/Lautrec.webp",
     emoji: "🛡️",
     type: "NPC",
     game: "Dark Souls I",
@@ -200,7 +200,7 @@ const CHARACTERS = [
   {
     id: "iron_golem",
     name: "Iron Golem",
-    image: "imgs/Iron_Golem.webp",
+    image: "imgs/personagens/Iron_Golem.webp",
     emoji: "🛡️",
     type: "Boss",
     game: "Dark Souls I",
@@ -213,7 +213,7 @@ const CHARACTERS = [
   {
     id: "havel",
     name: "Havel the Rock",
-    image: "imgs/Havel.webp",
+    image: "imgs/personagens/Havel.webp",
     emoji: "🛡️",
     type: "Inimigo",
     game: "Dark Souls I",
@@ -226,7 +226,7 @@ const CHARACTERS = [
   {
     id: "alvina",
     name: "Alvina",
-    image: "imgs/Alvina.webp",
+    image: "imgs/personagens/Alvinacat.webp",
     emoji: "🐱",
     type: "NPC",
     game: "Dark Souls I",
@@ -239,7 +239,7 @@ const CHARACTERS = [
   {
     id: "gwynevere",
     name: "Gwynevere",
-    image: "imgs/Gwynevere.jpg",
+    image: "imgs/personagens/Gwynevere.jpg",
     emoji: "👑",
     type: "NPC",
     game: "Dark Souls I",
@@ -252,7 +252,7 @@ const CHARACTERS = [
   {
     id: "gargoyles",
     name: "Gargoyles",
-    image: "imgs/Gargoyle.jpg",
+    image: "imgs/personagens/Gargoyle.jpg",
     emoji: "🛡️",
     type: "Boss",
     game: "Dark Souls I",
@@ -265,7 +265,7 @@ const CHARACTERS = [
   {
     id: "andre_of_astora",
     name: "Andre of Astora",
-    image: "imgs/Blacksmith_Andrei.webp",
+    image: "imgs/personagens/Blacksmith_Andrei.jpg",
     emoji: "🛡️",
     type: "NPC",
     game: "Dark Souls I",
@@ -278,7 +278,7 @@ const CHARACTERS = [
   {
     id: "giant_blacksmith",
     name: "Giant Blacksmith",
-    image: "imgs/giant-blacksmith.jpg",
+    image: "imgs/personagens/giant-blacksmith.jpg",
     emoji: "🛡️",
     type: "NPC",
     game: "Dark Souls I",
@@ -291,7 +291,7 @@ const CHARACTERS = [
   {
     id: "gapping_dragon",
     name: "Gapping Dragon",
-    image: "imgs/Gaping_Dragon.webp",
+    image: "imgs/personagens/Gaping_Dragon.webp",
     emoji: "🐉",
     type: "Boss",
     game: "Dark Souls I",
@@ -304,7 +304,7 @@ const CHARACTERS = [
   {
     id: "oscar_of_astora",
     name: "Oscar de Astora",
-    image: null,
+    image: "imgs/personagens/Oscar_Astora.webp",
     emoji: "🛡️",
     type: "NPC",
     game: "Dark Souls I",
@@ -356,7 +356,7 @@ const CHARACTERS = [
   {
     id: "logan_big_hat",
     name: "Logan Chapéu Grande",
-    image: null,
+    image: "imgs/personagens/Logan.webp",
     emoji: "🧙",
     type: "NPC",
     game: "Dark Souls I",
@@ -369,7 +369,7 @@ const CHARACTERS = [
   {
     id: "laurentius",
     name: "Laurentius",
-    image: null,
+    image: "imgs/personagens/Laurentius.webp",
     emoji: "🔥",
     type: "NPC",
     game: "Dark Souls I",
@@ -382,7 +382,7 @@ const CHARACTERS = [
   {
     id: "quelana",
     name: "Quelana de Izalith",
-    image: null,
+    image: "imgs/personagens/Quelana.webp",
     emoji: "🔥",
     type: "NPC",
     game: "Dark Souls I",
@@ -395,7 +395,7 @@ const CHARACTERS = [
   {
     id: "eingyi",
     name: "Eingyi",
-    image: null,
+    image: "imgs/personagens/Eingyi.webp",
     emoji: "🥚",
     type: "NPC",
     game: "Dark Souls I",
@@ -447,7 +447,7 @@ const CHARACTERS = [
   {
     id: "ingward",
     name: "Ingward",
-    image: null,
+    image: "imgs/personagens/Ingward.webp",
     emoji: "👺",
     type: "NPC",
     game: "Dark Souls I",
@@ -460,7 +460,7 @@ const CHARACTERS = [
   {
     id: "dusk",
     name: "Dusk de Oolacile",
-    image: null,
+    image: "imgs/personagens/Dusk_Oolacile.webp",
     emoji: "✨",
     type: "NPC",
     game: "Dark Souls I",
@@ -473,7 +473,7 @@ const CHARACTERS = [
   {
     id: "elizabeth",
     name: "Elizabeth",
-    image: null,
+    image: "imgs/personagens/Elizabeth.webp",
     emoji: "🍄",
     type: "NPC",
     game: "Dark Souls I",
@@ -486,7 +486,7 @@ const CHARACTERS = [
   {
     id: "gough",
     name: "Hawkeye Gough",
-    image: null,
+    image: "imgs/personagens/Hawkeye_Gough.webp",
     emoji: "🏹",
     type: "NPC",
     game: "Dark Souls I",
@@ -499,7 +499,7 @@ const CHARACTERS = [
   {
     id: "ciaran",
     name: "Lord's Blade Ciaran",
-    image: null,
+    image: "imgs/personagens/Ciaran.webp",
     emoji: "🗡️",
     type: "NPC",
     game: "Dark Souls I",
@@ -512,7 +512,7 @@ const CHARACTERS = [
   {
     id: "kalameet",
     name: "Black Dragon Kalameet",
-    image: null,
+    image: "imgs/personagens/black-dragon-kalameet-large.jpg",
     emoji: "🐉",
     type: "Boss",
     game: "Dark Souls I",
@@ -525,7 +525,7 @@ const CHARACTERS = [
   {
     id: "manus",
     name: "Manus, Pai do Abismo",
-    image: null,
+    image: "imgs/personagens/Manus.jpg",
     emoji: "🌑",
     type: "Boss",
     game: "Dark Souls I",
@@ -538,7 +538,7 @@ const CHARACTERS = [
   {
     id: "sanctuary_guardian",
     name: "Sanctuary Guardian",
-    image: null,
+    image: "imgs/personagens/Sanctuary_Guardian.jpg",
     emoji: "🦁",
     type: "Boss",
     game: "Dark Souls I",
@@ -551,7 +551,7 @@ const CHARACTERS = [
   {
     id: "pinwheel",
     name: "Pinwheel",
-    image: null,
+    image: "imgs/personagens/Pinwheel.jpg",
     emoji: "🎭",
     type: "Boss",
     game: "Dark Souls I",
@@ -577,7 +577,7 @@ const CHARACTERS = [
   {
     id: "taurus_demon",
     name: "Demônio Touro",
-    image: null,
+    image: "imgs/personagens/Taurus_Demon.jpg",
     emoji: "🐂",
     type: "Boss",
     game: "Dark Souls I",
@@ -590,7 +590,7 @@ const CHARACTERS = [
   {
     id: "capra_demon",
     name: "Demônio Capra",
-    image: null,
+    image: "imgs/personagens/Capra_demon.webp",
     emoji: "🐐",
     type: "Boss",
     game: "Dark Souls I",
@@ -656,7 +656,7 @@ const CHARACTERS = [
   {
     id: "nashandra",
     name: "Nashandra",
-    image: "imgs/Nashandra.png",
+    image: "imgs/personagens/Nashandra.png",
     emoji: "👸",
     type: "Boss",
     game: "Dark Souls II",
@@ -669,7 +669,7 @@ const CHARACTERS = [
   {
     id: "vendrick",
     name: "Vendrick",
-    image: "imgs/King_Vendrick.webp",
+    image: "imgs/personagens/King_Vendrick.webp",
     emoji: "👑",
     type: "Boss",
     game: "Dark Souls II",
@@ -682,7 +682,7 @@ const CHARACTERS = [
   {
     id: "velstadt",
     name: "Velstadt",
-    image: "imgs/Velstadt.jpg",
+    image: "imgs/personagens/Velstadt.jpg",
     emoji: "⚔️",
     type: "Boss",
     game: "Dark Souls II",
@@ -695,7 +695,7 @@ const CHARACTERS = [
   {
     id: "lucatiel",
     name: "Lucatiel de Mirrah",
-    image: "imgs/Lucatiel.webp",
+    image: "imgs/personagens/Lucatiel.webp",
     emoji: "🗡️",
     type: "NPC",
     game: "Dark Souls II",
@@ -708,7 +708,7 @@ const CHARACTERS = [
   {
     id: "emerald_herald",
     name: "Emerald Herald",
-    image: "imgs/Emerald_Herald.webp",
+    image: "imgs/personagens/Emerald_Herald.webp",
     emoji: "🗡️",
     type: "NPC",
     game: "Dark Souls II",

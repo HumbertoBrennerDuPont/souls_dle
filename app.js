@@ -371,7 +371,7 @@ function renderSuggestions(matches) {
     characters: '👤',
     items: '🏺',
     scenery: '🏰',
-    music: '<img src="imgs/Solaris-Photoroom.png" style="width:24px; vertical-align:middle;">'
+    music: '<img src="imgs/personagens/Solaris-Photoroom.png" style="width:24px; vertical-align:middle;">'
   };
 
   matches.forEach((item, i) => {
