@@ -156,7 +156,8 @@ const MUSIC = [
   { id: "hail_the_nightmare", name: "Hail the Nightmare", audio: null, type: "Trilha Sonora" },
   { id: "lullaby_for_mergo", name: "Lullaby for Mergo", audio: null, type: "Trilha Sonora" },
   { id: "hunter_dream_theme", name: "The Hunter's Dream", audio: null, type: "Trilha Sonora" },
-  { id: "omen", name: "Omen", audio: null, type: "Trilha Sonora" }
+  { id: "gaping_dragon_theme", name: "Gaping Dragon", audio: "audio/Motoi Sakuraba - Gaping Dragon.mp3", type: "Trilha Sonora" },
+  { id: "tauros_demon_theme", name: "Tauros Demon", audio: "audio/Motoi Sakuraba - Tauros Demon.mp3", type: "Trilha Sonora" }
 ];
 
 function getDailyTarget(category) {
